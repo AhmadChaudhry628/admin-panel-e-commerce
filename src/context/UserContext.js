@@ -1,5 +1,5 @@
 import React from "react";
-
+import axios from 'axios'
 var UserStateContext = React.createContext();
 var UserDispatchContext = React.createContext();
 
@@ -9,6 +9,7 @@ function userReducer(state, action) {
       return { ...state, isAuthenticated: true };
     case "SIGN_OUT_SUCCESS":
       return { ...state, isAuthenticated: false };
+
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -17,7 +18,7 @@ function userReducer(state, action) {
 
 function UserProvider({ children }) {
   var [state, dispatch] = React.useReducer(userReducer, {
-    isAuthenticated: !!localStorage.getItem("id_token"),
+    isAuthenticated: !!localStorage.getItem("token"),
   });
 
   return (
@@ -54,14 +55,26 @@ function loginUser(dispatch, login, password, history, setIsLoading, setError) {
   setIsLoading(true);
 
   if (!!login && !!password) {
-    setTimeout(() => {
-      localStorage.setItem('id_token', 1)
-      setError(null)
-      setIsLoading(false)
-      dispatch({ type: 'LOGIN_SUCCESS' })
-
-      history.push('/app/dashboard')
-    }, 2000);
+    axios.post(`${process.env.REACT_APP_AUTH_SERVER}/user/login`, {
+      email: login,
+      password: password
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          const token = response.data.token
+          localStorage.setItem('token', token)
+          setError(null)
+          setIsLoading(false)
+          dispatch({ type: 'LOGIN_SUCCESS' })
+          history.push('/app/dashboard')
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch({ type: "LOGIN_FAILURE" });
+        setError(true);
+        setIsLoading(false);
+      });
   } else {
     dispatch({ type: "LOGIN_FAILURE" });
     setError(true);
@@ -70,7 +83,7 @@ function loginUser(dispatch, login, password, history, setIsLoading, setError) {
 }
 
 function signOut(dispatch, history) {
-  localStorage.removeItem("id_token");
+  localStorage.removeItem("token");
   dispatch({ type: "SIGN_OUT_SUCCESS" });
   history.push("/login");
 }

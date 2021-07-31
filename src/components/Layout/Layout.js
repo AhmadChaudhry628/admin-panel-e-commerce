@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Route,
   Switch,
@@ -6,8 +6,9 @@ import {
   withRouter,
 } from "react-router-dom";
 import classnames from "classnames";
-import {Box, IconButton, Link} from '@material-ui/core'
+import { Box, IconButton, Link } from '@material-ui/core'
 import Icon from '@mdi/react'
+import { useHistory } from "react-router-dom";
 
 //icons
 import {
@@ -31,42 +32,52 @@ import Maps from "../../pages/maps";
 import Tables from "../../pages/tables";
 import Icons from "../../pages/icons";
 import Charts from "../../pages/charts";
-
+import Products from '../../pages/products'
+import StripeContainer from "../../Stripe/StripeContainer";
 // context
 import { useLayoutState } from "../../context/LayoutContext";
+var jwt = require('jsonwebtoken');
+
 
 function Layout(props) {
   var classes = useStyles();
+  let history = useHistory();
 
+
+  
   // global
   var layoutState = useLayoutState();
 
   return (
     <div className={classes.root}>
-        <>
-          <Header history={props.history} />
-          <Sidebar />
-          <div
-            className={classnames(classes.content, {
-              [classes.contentShift]: layoutState.isSidebarOpened,
-            })}
-          >
-            <div className={classes.fakeToolbar} />
-            <Switch>
-              <Route path="/app/dashboard" component={Dashboard} />
-              <Route path="/app/typography" component={Typography} />
-              <Route path="/app/tables" component={Tables} />
-              <Route path="/app/notifications" component={Notifications} />
-              <Route
-                exact
-                path="/app/ui"
-                render={() => <Redirect to="/app/ui/icons" />}
-              />
-              <Route path="/app/ui/maps" component={Maps} />
-              <Route path="/app/ui/icons" component={Icons} />
-              <Route path="/app/ui/charts" component={Charts} />
-            </Switch>
-            <Box
+      <>
+        <Header history={props.history} />
+        <Sidebar />
+        <div
+          className={classnames(classes.content, {
+            [classes.contentShift]: layoutState.isSidebarOpened,
+          })}
+        >
+          <div className={classes.fakeToolbar} />
+          <Switch>
+            <Route path="/app/dashboard" component={Dashboard} />
+            <Route path="/app/typography" component={Typography} />
+            <Route path="/app/tables" component={Tables} />
+            <Route path="/app/products" component={Products} />
+
+            <Route path="/app/notifications" component={Notifications} />
+            <Route path="/app/payment" component={StripeContainer} />
+
+            <Route
+              exact
+              path="/app/ui"
+              render={() => <Redirect to="/app/ui/icons" />}
+            />
+            <Route path="/app/ui/maps" component={Maps} />
+            <Route path="/app/ui/icons" component={Icons} />
+            <Route path="/app/ui/charts" component={Charts} />
+          </Switch>
+          {/* <Box
               mt={5}
               width={"100%"}
               display={"flex"}
@@ -140,9 +151,9 @@ function Layout(props) {
                   </IconButton>
                 </Link>
               </div>
-            </Box>
-          </div>
-        </>
+            </Box> */}
+        </div>
+      </>
     </div>
   );
 }

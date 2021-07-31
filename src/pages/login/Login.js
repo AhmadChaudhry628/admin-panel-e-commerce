@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import { withRouter } from "react-router-dom";
 import classnames from "classnames";
+import { GoogleLogin } from 'react-google-login';
 
 // styles
 import useStyles from "./styles";
@@ -33,9 +34,11 @@ function Login(props) {
   var [error, setError] = useState(null);
   var [activeTabId, setActiveTabId] = useState(0);
   var [nameValue, setNameValue] = useState("");
-  var [loginValue, setLoginValue] = useState("admin@flatlogic.com");
-  var [passwordValue, setPasswordValue] = useState("password");
-
+  var [loginValue, setLoginValue] = useState("");
+  var [passwordValue, setPasswordValue] = useState("");
+  const responseGoogle = (response) => {
+    console.log(response);
+  }
   return (
     <Grid container className={classes.container}>
       <div className={classes.logotypeContainer}>
@@ -59,10 +62,20 @@ function Login(props) {
               <Typography variant="h1" className={classes.greeting}>
                 Good Morning, User
               </Typography>
-              <Button size="large" className={classes.googleButton}>
-                <img src={google} alt="google" className={classes.googleIcon} />
-                &nbsp;Sign in with Google
-              </Button>
+              <GoogleLogin
+                clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+                render={renderProps => (
+                  <Button onClick={renderProps.onClick} disabled={renderProps.disabled} size="large" className={classes.googleButton}>
+                    <img src={google} alt="google" className={classes.googleIcon} />
+                    &nbsp;Sign in with Google
+                  </Button>
+                )}
+                buttonText="Login"
+                onSuccess={responseGoogle}
+                onFailure={responseGoogle}
+                cookiePolicy={'single_host_origin'}
+              />
+
               <div className={classes.formDividerContainer}>
                 <div className={classes.formDivider} />
                 <Typography className={classes.formDividerWord}>or</Typography>
@@ -245,7 +258,7 @@ function Login(props) {
           )}
         </div>
         <Typography color="primary" className={classes.copyright}>
-        © 2014-{new Date().getFullYear()} <a style={{ textDecoration: 'none', color: 'inherit' }} href="https://flatlogic.com" rel="noopener noreferrer" target="_blank">Flatlogic</a>, LLC. All rights reserved.
+          © 2014-{new Date().getFullYear()} <a style={{ textDecoration: 'none', color: 'inherit' }} href="https://flatlogic.com" rel="noopener noreferrer" target="_blank">Flatlogic</a>, LLC. All rights reserved.
         </Typography>
       </div>
     </Grid>
